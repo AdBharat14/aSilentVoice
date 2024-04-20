@@ -3,6 +3,9 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:picovoice_flutter/picovoice_error.dart';
 import 'package:picovoice_flutter/picovoice_manager.dart';
 import 'package:rhino_flutter/rhino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
 
 
 class HomePage extends StatefulWidget {
@@ -22,6 +25,7 @@ class _HomePageState extends State<HomePage> {
 
 
   bool _isListening = false;
+  bool isSpeaking = false;
   PicovoiceManager? _picovoiceManager;
   
   @override
@@ -59,16 +63,35 @@ class _HomePageState extends State<HomePage> {
     // _speak("Hello,I am zoro.");
   }
 
-  _inferenceCallback(RhinoInference inference) {
+  Future<void> _findAndSpeak(String manga) async {
+    print(manga);
+  QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+      .collection('mangas')
+      .where('name', isEqualTo: manga) // Use the 'manga' parameter here
+      .get();
+  
+  if (querySnapshot.size > 0) {
+    String mainText = querySnapshot.docs[0].data()["main_text"].toString();
+    await _speak(mainText, 0.2);
+  } else {
+    print('Manga not found');
+  }
+}
+
+  _inferenceCallback(RhinoInference inference) async {
     if(inference.isUnderstood!){
       Map<String , String>? slots = inference.slots!;
       if(inference.intent == "open_manga"){
         String? manga = slots["manga"];
-        _speak("Opening ${manga!} manga");
-
+        manga = manga!.replaceAll(' ', '');
+        await _speak("Opening ${manga!} manga", 0.5);
+        _findAndSpeak(manga);
+      }
+      else if(inference.intent == "stop"){
+        await flutterTts.stop();
       }
     }else{
-      _speak("I did not understand your command. Please repeat.");
+      _speak("I did not understand your command. Please repeat.", 0.5);
     }
     setState(() {
       _isListening = false;
@@ -79,9 +102,18 @@ class _HomePageState extends State<HomePage> {
     print(error.message);
   }
 
-  _speak(String content) async{
+  _speak(String content, var rate) async{
+    if (isSpeaking) {
+      // Wait for the current speech to finish before starting the new one
+      await Future.delayed(Duration(seconds: 1));
+      return _speak(content, rate);
+    }
+    isSpeaking = true;
+    await flutterTts.setQueueMode(1);
     await flutterTts.setLanguage('en-US');
+    await flutterTts.setSpeechRate(rate);
     await flutterTts.speak(content);
+    isSpeaking = false;
   }
 
   @override
