@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:picovoice_flutter/picovoice_error.dart';
 import 'package:picovoice_flutter/picovoice_manager.dart';
 import 'package:rhino_flutter/rhino.dart';
@@ -16,6 +17,9 @@ class _HomePageState extends State<HomePage> {
       "vTOSlvjB0JX/YFEvd7s4idEVeXmOxWKdZGUowafSF2ru4k6zUxQd5A==";
   final String keywordAsset = "./assets/zoro.ppn";
   final String contextAsset = "./assets/mangaReader.rhn";
+
+  final FlutterTts flutterTts = FlutterTts();
+
 
   bool _isListening = false;
   PicovoiceManager? _picovoiceManager;
@@ -60,8 +64,11 @@ class _HomePageState extends State<HomePage> {
       Map<String , String>? slots = inference.slots!;
       if(inference.intent == "open_manga"){
         String? manga = slots["manga"];
+        _speak("Opening ${manga!} manga");
+
       }
     }else{
+      _speak("I did not understand your command. Please repeat.");
     }
     setState(() {
       _isListening = false;
@@ -70,6 +77,11 @@ class _HomePageState extends State<HomePage> {
 
   _errorCallback(PicovoiceException error) {
     print(error.message);
+  }
+
+  _speak(String content) async{
+    await flutterTts.setLanguage('en-US');
+    await flutterTts.speak(content);
   }
 
   @override
