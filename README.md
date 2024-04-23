@@ -31,7 +31,7 @@ Making illustrated media accessible for visually impaired people.
 
 ## Contributors:
 
-Team Name: NoTimeToBath
+Team Name: No_Time_To_Bath
 
 * [Vinayak Kushwaha](https://github.com/Vinayak9307)
 * [Bharat Adhikari](https://github.com/AdBharat14)
