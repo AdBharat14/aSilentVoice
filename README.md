@@ -33,9 +33,9 @@ Making illustrated media accessible for visually impaired people.
 
 Team Name: No_Time_To_Bath
 
-* [Saket Kumar](https://github.com/backlit69)
-* [Vinayak Kushwaha](https://github.com/Vinayak9307)
+* [Saket Kumar](https://github.com/backlit69)\
 * [Bharat Adhikari](https://github.com/AdBharat14)
+* [Vinayak Kushwaha](https://github.com/Vinayak9307)
 * [Yash Pal Singh](https://github.com/protonium71)
 
 
